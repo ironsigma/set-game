@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 
 import javax.swing.JComponent;
 
@@ -25,10 +26,14 @@ class Card extends JComponent {
 
 	protected final int WIDTH = 60;
 	protected final int HEIGHT = 60;
-	protected final int SPACING = 10;
+	protected final int SPACING = 20;
 
 	protected final static BasicStroke stroke = new BasicStroke(4);
 	protected final static java.awt.Color selectedColor = new java.awt.Color(255, 255, 0, 128);
+	protected final static java.awt.Color greenColor = new java.awt.Color(0, 128, 0);
+	protected final static java.awt.Color redColor = new java.awt.Color(200, 0, 0);
+	protected final static java.awt.Color blueColor = new java.awt.Color(0, 0, 200);
+	protected final static java.awt.Color gradientColor = java.awt.Color.white;
 
 	protected boolean selected;
 	protected int count;
@@ -68,7 +73,9 @@ class Card extends JComponent {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g.create();
-		GradientPaint paint;
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
+
+		GradientPaint paint = null;
 		java.awt.Color shapeColor = java.awt.Color.black;
 
 		if (selected) {
@@ -84,21 +91,21 @@ class Card extends JComponent {
 
 		switch (color) {
 		case RED:
-			shapeColor = java.awt.Color.red;
+			shapeColor = redColor;
 			break;
 
 		case BLUE:
-			shapeColor = java.awt.Color.blue;
+			shapeColor = blueColor;
 			break;
 
 		case GREEN:
-			shapeColor = java.awt.Color.green;
+			shapeColor = greenColor;
 			break;
 		}
 
 		switch (fill) {
 		case SHADED:
-			paint = new GradientPaint(5, 5, shapeColor, 5, 8, java.awt.Color.white, true);
+			paint = new GradientPaint(6, 6, gradientColor, 8, 8, shapeColor, true);
 			g2d.setPaint(paint);
 			break;
 
@@ -128,6 +135,10 @@ class Card extends JComponent {
 					g2d.drawOval(leading + i * (WIDTH + SPACING), SPACING, WIDTH, HEIGHT);
 				} else {
 					g2d.fillOval(leading + i * (WIDTH + SPACING), SPACING, WIDTH, HEIGHT);
+					g2d.setColor(shapeColor);
+					g2d.setStroke(stroke);
+					g2d.drawOval(leading + i * (WIDTH + SPACING), SPACING, WIDTH, HEIGHT);
+					g2d.setPaint(paint);
 				}
 				break;
 
@@ -136,6 +147,10 @@ class Card extends JComponent {
 					g2d.drawRect(leading + i * (WIDTH + SPACING), SPACING, WIDTH, HEIGHT);
 				} else {
 					g2d.fillRect(leading + i * (WIDTH + SPACING), SPACING, WIDTH, HEIGHT);
+					g2d.setColor(shapeColor);
+					g2d.setStroke(stroke);
+					g2d.drawRect(leading + i * (WIDTH + SPACING), SPACING, WIDTH, HEIGHT);
+					g2d.setPaint(paint);
 				}
 				break;
 
@@ -148,6 +163,12 @@ class Card extends JComponent {
 					g2d.fillPolygon(new int[] { leading + ((WIDTH + SPACING) * i) + WIDTH / 2,
 							leading + ((WIDTH + SPACING) * i), leading + ((WIDTH + SPACING) * i) + WIDTH }, new int[] {
 							SPACING, SPACING + HEIGHT, SPACING + HEIGHT }, 3);
+					g2d.setColor(shapeColor);
+					g2d.setStroke(stroke);
+					g2d.drawPolygon(new int[] { leading + ((WIDTH + SPACING) * i) + WIDTH / 2,
+							leading + ((WIDTH + SPACING) * i), leading + ((WIDTH + SPACING) * i) + WIDTH }, new int[] {
+							SPACING, SPACING + HEIGHT, SPACING + HEIGHT }, 3);
+					g2d.setPaint(paint);
 				}
 			}
 		}
