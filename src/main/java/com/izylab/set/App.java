@@ -223,9 +223,9 @@ public class App extends JFrame implements MouseListener {
 
 	protected static List<Card> buildDeck(DeckType type) {
 		List<Card> cardList = new ArrayList<Card>();
-		for (Card.Color color : Card.Color.values()) {
+		for (Card.Coloring color : Card.Coloring.values()) {
 			if ( type == DeckType.EASY ) {
-				List<Card.Color> colors = Arrays.asList(Card.Color.values());
+				List<Card.Coloring> colors = Arrays.asList(Card.Coloring.values());
 				Collections.shuffle(colors);
 				color = colors.get(0);
 			}
