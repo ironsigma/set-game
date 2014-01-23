@@ -28,7 +28,7 @@ class Card extends JComponent {
 	}
 
 	public enum Shape {
-		CIRCLE, SQUARE, DIAMOND
+		CIRCLE, SQUARE, TRIANGLE
 	}
 
 	public enum Fill {
@@ -104,7 +104,8 @@ class Card extends JComponent {
 
 		case OUTLINE:
 			g2d.setStroke(stroke);
-			// fall through
+			g2d.setColor(color.getColor());
+			break;
 
 		case SOLID:
 			g2d.setColor(color.getColor());
@@ -149,21 +150,17 @@ class Card extends JComponent {
 				}
 				break;
 
-			case DIAMOND:
+			case TRIANGLE:
 				int[] xPoints = new int[] {
 						leading + ((WIDTH + SPACING) * i) + WIDTH / 2,
 						leading + ((WIDTH + SPACING) * i),
-						leading + ((WIDTH + SPACING) * i) + WIDTH / 2,
 						leading + ((WIDTH + SPACING) * i) + WIDTH,
-						leading + ((WIDTH + SPACING) * i) + WIDTH / 2,
 					};
 
 				int[] yPoints = new int[] {
 						SPACING,
-						SPACING + HEIGHT / 2,
 						SPACING + HEIGHT,
-						SPACING + HEIGHT / 2,
-						SPACING,
+						SPACING + HEIGHT,
 					};
 
 				if (fill == Fill.OUTLINE) {
