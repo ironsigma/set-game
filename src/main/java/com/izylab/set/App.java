@@ -7,7 +7,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -28,10 +27,8 @@ import org.apache.log4j.Logger;
 public class App extends JFrame implements MouseListener {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = Logger.getLogger(App.class);
-	protected enum DeckType { FULL, HALF, TINY, EASY }
 	
-
-	protected List<Card> cardList = new ArrayList<Card>();
+	protected Deck deck;
 	protected Iterator<Card> cardIterator;
 	protected List<Card> hand = new ArrayList<Card>();
 	protected List<Card> selectedCardList = new ArrayList<Card>(3);
@@ -58,12 +55,10 @@ public class App extends JFrame implements MouseListener {
 		getContentPane().add(cardPanel, BorderLayout.CENTER);
 		getContentPane().add(statusBar, BorderLayout.SOUTH);
 
-		cardList = buildDeck(DeckType.TINY);
-		cardIterator = cardList.iterator();
-		for ( Card c : cardList ) {
-			c.addMouseListener(this);
-		}
+		deck = new Deck(Deck.Type.TINY);
+		deck.addMouseListener(this);
 		
+		cardIterator = deck.iterator();
 		for ( int i = 0; i < 12; i ++ ) {
 			Card card = cardIterator.next();
 			hand.add(card);
@@ -71,7 +66,7 @@ public class App extends JFrame implements MouseListener {
 			//log.info(card);
 		}
 
-		cardsLeft = cardList.size();
+		cardsLeft = deck.getCount();
 		
 		findSolutions();
 
@@ -87,6 +82,10 @@ public class App extends JFrame implements MouseListener {
 		setLocationRelativeTo(null);
 		setVisible(true);
 		timer = System.currentTimeMillis();
+	}
+	
+	protected void startNewGame() {
+		
 	}
 	
 	protected int findSolutions() {
@@ -219,35 +218,6 @@ public class App extends JFrame implements MouseListener {
 
 			selectedCardList.clear();
 		}
-	}
-
-	protected static List<Card> buildDeck(DeckType type) {
-		List<Card> cardList = new ArrayList<Card>();
-		for (Card.Coloring color : Card.Coloring.values()) {
-			if ( type == DeckType.EASY ) {
-				List<Card.Coloring> colors = Arrays.asList(Card.Coloring.values());
-				Collections.shuffle(colors);
-				color = colors.get(0);
-			}
-			for (Card.Shape shape : Card.Shape.values()) {
-				for (Card.Fill fill : Card.Fill.values()) {
-					for ( int count = 1; count < 4; count ++) {
-						cardList.add(new Card(count, color, shape, fill));
-					}
-				}
-			}
-			if ( type == DeckType.EASY ) {
-				break;
-			}
-		}
-		Collections.shuffle(cardList);
-		if ( type == DeckType.HALF ) {
-			cardList.subList(42, cardList.size()).clear();
-		}
-		if ( type == DeckType.TINY ) {
-			cardList.subList(21, cardList.size()).clear();
-		}
-		return cardList;
 	}
 
 	@Override public void mouseClicked(MouseEvent e) { }
