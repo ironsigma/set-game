@@ -36,4 +36,9 @@ public class SetCard implements Card {
 		return shade;
 	}
 
+	@Override
+	public String toString() {
+		return String.format("Count: %d, Color: %s, Shape: %s, Shade: %s",
+				count, color.toString(), shape.toString(), shade.toString());
+	}
 }
