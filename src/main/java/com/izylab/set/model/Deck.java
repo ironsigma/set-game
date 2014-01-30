@@ -17,4 +17,5 @@ public interface Deck {
 
 	int getCount();
 	Card getNext();
+	boolean hasNext();
 }

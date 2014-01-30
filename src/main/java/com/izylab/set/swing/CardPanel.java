@@ -11,7 +11,9 @@ import java.awt.RenderingHints;
 import javax.swing.JComponent;
 
 import com.izylab.set.model.Card;
+import com.izylab.set.model.Card.Coloring;
 import com.izylab.set.model.Card.Shade;
+import com.izylab.set.model.Card.Shape;
 
 class CardPanel extends JComponent {
 	private static final long serialVersionUID = 1L;
@@ -48,6 +50,19 @@ class CardPanel extends JComponent {
 	public void setSelected(boolean selected) {
 		this.selected = selected;
 		repaint();
+	}
+
+	public void clear() {
+		setVisible(false);
+		card = null;
+	}
+	
+	public String toString() {
+		return String.format("%d %s %s %s",
+				card.getCount(),
+				card.getColor() == Coloring.COLOR1 ? "Yellow" : card.getColor() == Coloring.COLOR2 ? "Blue" : "Green",
+				card.getShade() == Shade.SHADE1 ? "Shaded" : card.getShade() == Shade.SHADE2 ? "Outlined" : "Solid",
+				card.getShape() == Shape.SHAPE1 ? "Circle" : card.getShape() == Shape.SHAPE2 ? "Square" : "Triangle");
 	}
 
 	@Override

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.apache.log4j.Logger;
@@ -22,6 +21,7 @@ public class BoardPanel extends JPanel implements MouseListener {
 	private static final int MAX_NUM_CARDS = 15;
 	private static final int NUM_CARDS = 12;
 
+	protected List<BoardPanelListener> listenerList = new ArrayList<BoardPanelListener>();
 	protected CardPanel[] cardList = new CardPanel[MAX_NUM_CARDS];
 	protected SolutionSet solution = new SolutionSet();
 	protected Deck deck;
@@ -41,45 +41,141 @@ public class BoardPanel extends JPanel implements MouseListener {
 		// TODO: calculate from cards
 		setPreferredSize(new Dimension(800, 532));
 	}
-
+	
+	public void addListener(BoardPanelListener listener) {
+		log.debug("Addign listener: " + listener.toString());
+		listenerList.add(listener);
+	}
+	
 	public void setupBoard() {
+		log.debug("Setting up board");
 		for ( int i = 0; i < NUM_CARDS; i ++ ) {
 			cardList[i].setCard(deck.getNext());
 			cardList[i].setVisible(true);
 		}
-		countSolutions();
+		addAdditionalCardsIfRequired();
 	}
 
 	public void clearBoard() {
+		log.debug("Clearing board");
 		for ( int i = 0; i < MAX_NUM_CARDS; i ++ ) {
 			cardList[i].setVisible(false);
 		}
 	}
 	
+	protected void addAdditionalCardsIfRequired() {
+		log.debug("Checking solutions, for posible additinal cards");
+		int solutions;
+		while ( (solutions = countSolutions()) == 0 && deck.hasNext() ) {
+			log.debug("No sets found, adding three more... ");
+			for ( int i = 0; i < 3; i ++ ) {
+				if ( !deck.hasNext() ) {
+					log.debug("No more cards in deck");
+					break;
+				}
+				Card newCard = deck.getNext();
+				boolean assigned = false;
+				for ( Component component : getComponents() ) {
+					if ( !component.isVisible() ) {
+						((CardPanel)component).setCard(newCard);
+						component.setVisible(true);
+						log.debug("Adding extra card: " + component.toString());
+						assigned = true;
+						break;
+					}
+				}
+				if ( assigned == false ) {
+					log.fatal("Wow, ran out of panels to diplay card!");
+				}
+			}
+		}
+
+		for (BoardPanelListener listener : listenerList ) {
+			listener.cardsDealt(deck.getCount());
+		}
+
+		if ( solutions == 0 ) {
+			log.debug("No more sets found");
+			for (BoardPanelListener listener : listenerList ) {
+				listener.noMoreSolutions();
+			}
+			return;
+		}
+
+		for ( BoardPanelListener listener : listenerList ) {
+			listener.solutionCountUpdate(solutions);
+		}
+		
+	}
+
+	protected int cardsOnBoard() {
+		int count = 0;
+		for ( Component component : getComponents() ) {
+			if ( component.isVisible() ) {
+				count ++;
+			}
+		}
+		return count;
+	}
+
 	protected void checkSolution() {
 		if ( solution.getCount() != 3 ) {
 			return ;
 		}
 
 		if ( !solution.isValid() ) {
-			JOptionPane.showMessageDialog(this, "Not a vaid SET", "SET", JOptionPane.WARNING_MESSAGE);
-			log.info("Invalid set selected");
+			log.debug("Invalid set selected");
+			for (BoardPanelListener listener : listenerList ) {
+				listener.invalidSolution(solution.cardPanel1.card, solution.cardPanel2.card, solution.cardPanel3.card);
+			}
 			solution.clear();
 			return;
 		}
 
-		log.info("Found solution");
+		log.debug("Found solution");
+		for (BoardPanelListener listener : listenerList ) {
+			listener.solutionFound(solution.cardPanel1.card, solution.cardPanel2.card, solution.cardPanel3.card);
+		}
+		
+		int cardsOnBoard = cardsOnBoard();
+
+		// Add swap for new cards
+		log.debug("Swaping set found with new cards");
+		if ( cardsOnBoard <= 12 && deck.hasNext() ) {
+			solution.cardPanel1.setCard(deck.getNext());
+		} else {
+			log.debug("No more cards in deck to replace card 1");
+			solution.cardPanel1.clear();
+		}
+
+		if ( cardsOnBoard <= 12 && deck.hasNext() ) {
+			solution.cardPanel2.setCard(deck.getNext());
+		} else {
+			log.debug("No more cards in deck to replace card 2");
+			solution.cardPanel2.clear();
+		}
+
+		if ( cardsOnBoard <= 12 && deck.hasNext() ) {
+			solution.cardPanel3.setCard(deck.getNext());
+		} else {
+			log.debug("No more cards in deck to replace card 3");
+			solution.cardPanel3.clear();
+		}
+
 		solution.clear();
+		addAdditionalCardsIfRequired();
 	}
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		if ( e.getSource() instanceof CardPanel ) {
 			CardPanel cardPanel = (CardPanel)e.getSource();
+			cardPanel.setSelected(!cardPanel.getSelected());
 			if ( cardPanel.getSelected() ) {
+				solution.add(cardPanel);
+			} else {
 				solution.remove(cardPanel);
 			}
-			solution.add(cardPanel);
 			checkSolution();
 		}
 	}
@@ -113,6 +209,9 @@ public class BoardPanel extends JPanel implements MouseListener {
 		}
 		
 		log.debug(String.format("%d set available", solutions.size()));
+		for ( SolutionSet sol : solutions ) {
+			log.debug(sol);
+		}
 		return solutions.size();
 	}
 
@@ -179,9 +278,9 @@ public class BoardPanel extends JPanel implements MouseListener {
 		@Override
 		public String toString() {
 			return String.format("[%s] [%s] [%s]",
-					cardPanel1.getCard().toString(),
-					cardPanel2.getCard().toString(),
-					cardPanel3.getCard().toString());
+					cardPanel1.toString(),
+					cardPanel2.toString(),
+					cardPanel3.toString());
 		}
 
 		@Override

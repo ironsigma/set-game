@@ -33,6 +33,7 @@ public class SetDeck implements Deck {
 		return type.getCount();
 	}
 	
+	@Override
 	public boolean hasNext() {
 		return index < type.getCount();
 	}
