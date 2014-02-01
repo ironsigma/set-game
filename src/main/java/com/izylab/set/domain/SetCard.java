@@ -2,43 +2,85 @@ package com.izylab.set.domain;
 
 import com.izylab.set.model.Card;
 
-public class SetCard implements Card {
-	protected int count;
-	protected Shape shape;
-	protected Shade shade;
-	protected Coloring color;
+/**
+ * Set Card.
+ */
+final class SetCard implements Card {
+    /** Number of shapes. */
+    private int shapeCount;
+    /** Card shape. */
+    private Shape cardShape;
+    /** Card shade. */
+    private Shade cardShade;
+    /** Card coloring. */
+    private Coloring cardColor;
 
+    /**
+     * Constructor.
+     * @param count Count
+     * @param color Coloring
+     * @param shape Shape
+     * @param shade Shade
+     */
+    public SetCard(final int count, final Coloring color, final Shape shape,
+            final Shade shade) {
+        this.shapeCount = count;
+        this.cardColor = color;
+        this.cardShape = shape;
+        this.cardShade = shade;
+    }
 
-	public SetCard(int count, Coloring color, Shape shape, Shade shade) {
-		this.count = count;
-		this.color = color;
-		this.shape = shape;
-		this.shade = shade;
-	}
+    @Override
+    public int getCount() {
+        return shapeCount;
+    }
 
-	@Override
-	public int getCount() {
-		return count;
-	}
+    @Override
+    public Shape getShape() {
+        return cardShape;
+    }
 
-	@Override
-	public Shape getShape() {
-		return shape;
-	}
+    @Override
+    public Coloring getColor() {
+        return cardColor;
+    }
 
-	@Override
-	public Coloring getColor() {
-		return color;
-	}
+    @Override
+    public Shade getShade() {
+        return cardShade;
+    }
 
-	@Override
-	public Shade getShade() {
-		return shade;
-	}
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        SetCard other = (SetCard) obj;
+        if (cardColor != other.cardColor) {
+            return false;
+        }
+        if (shapeCount != other.shapeCount) {
+            return false;
+        }
+        if (cardShade != other.cardShade) {
+            return false;
+        }
+        if (cardShape != other.cardShape) {
+            return false;
+        }
+        return true;
+    }
 
-	@Override
-	public String toString() {
-		return String.format("Count: %d, Color: %s, Shape: %s, Shade: %s",
-				count, color.toString(), shape.toString(), shade.toString());
-	}
+    @Override
+    public String toString() {
+        return String.format("Count: %d, Color: %s, Shape: %s, Shade: %s",
+                shapeCount, cardColor.toString(), cardShape.toString(),
+                cardShade.toString());
+    }
 }
